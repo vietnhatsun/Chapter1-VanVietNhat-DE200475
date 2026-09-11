@@ -12,6 +12,7 @@ import java.time.Period;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class Employee {
 
     @Id
@@ -36,6 +37,15 @@ public class Employee {
 
     @Transient
     private int yearsOfService;
+
+    public Employee(String fullName, String email, BigDecimal salary, Gender gender, LocalDate hireDate) {
+        this.fullName = fullName;
+        this.email = email;
+        this.salary = salary;
+        this.gender = gender;
+        this.hireDate = hireDate;
+        this.active = true;
+    }
 
     public int getYearsOfService() {
         if (hireDate == null) return 0;

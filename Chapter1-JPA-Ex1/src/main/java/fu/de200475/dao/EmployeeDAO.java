@@ -1,38 +1,44 @@
 package fu.de200475.dao;
 
 import fu.de200475.pojo.Employee;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.TypedQuery;
+import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class EmployeeDAO {
 
     private final EntityManagerFactory emf;
 
+    public EmployeeDAO() {
+        this.emf = Persistence.createEntityManagerFactory("hsf302FU");
+    }
+
     public EmployeeDAO(EntityManagerFactory emf) {
         this.emf = emf;
     }
 
-    // CREATE
-    public void insert(Employee employee) {
+    // ---------- CREATE (TODO 0.3) ----------
+    public void save(Employee e) {
         EntityManager em = emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
-            em.persist(employee);
+            em.persist(e);
             tx.commit();
-        } catch (Exception e) {
+        } catch (RuntimeException ex) {
             if (tx.isActive()) tx.rollback();
-            throw e;
+            throw ex;
         } finally {
             em.close();
         }
     }
 
-    // READ by ID
+    public void insert(Employee e) {
+        save(e);
+    }
+
+    // ---------- READ (TODO 0.4) ----------
     public Employee findById(Long id) {
         EntityManager em = emf.createEntityManager();
         try {
@@ -42,49 +48,86 @@ public class EmployeeDAO {
         }
     }
 
-    // READ all
     public List<Employee> findAll() {
         EntityManager em = emf.createEntityManager();
         try {
-            TypedQuery<Employee> query = em.createQuery("SELECT e FROM Employee e", Employee.class);
-            return query.getResultList();
+            return em.createQuery("SELECT e FROM Employee e", Employee.class)
+                    .getResultList();
         } finally {
             em.close();
         }
     }
 
-    // UPDATE
-    public void update(Employee employee) {
+    // ---------- READ with Conditions (TODO 0.5) ----------
+    public Employee findByEmail(String email) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            List<Employee> result = em.createQuery(
+                            "SELECT e FROM Employee e WHERE e.email = :email", Employee.class)
+                    .setParameter("email", email)
+                    .getResultList();
+            return result.isEmpty() ? null : result.get(0);
+        } finally {
+            em.close();
+        }
+    }
+
+    public List<Employee> findBySalaryGreaterThanAndActive(BigDecimal minSalary) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery(
+                            "SELECT e FROM Employee e WHERE e.salary > :minSalary AND e.active = true",
+                            Employee.class)
+                    .setParameter("minSalary", minSalary)
+                    .getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    // ---------- UPDATE (TODO 0.6) ----------
+    public Employee update(Employee e) {
         EntityManager em = emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
-            em.merge(employee);
+            Employee merged = em.merge(e);
             tx.commit();
-        } catch (Exception e) {
+            return merged;
+        } catch (RuntimeException ex) {
             if (tx.isActive()) tx.rollback();
-            throw e;
+            throw ex;
         } finally {
             em.close();
         }
     }
 
-    // DELETE by ID
-    public void deleteById(Long id) {
+    // ---------- DELETE (TODO 0.7) ----------
+    public void delete(Long id) {
         EntityManager em = emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
-            Employee employee = em.find(Employee.class, id);
-            if (employee != null) {
-                em.remove(employee);
+            Employee e = em.find(Employee.class, id);
+            if (e != null) {
+                em.remove(e);
             }
             tx.commit();
-        } catch (Exception e) {
+        } catch (RuntimeException ex) {
             if (tx.isActive()) tx.rollback();
-            throw e;
+            throw ex;
         } finally {
             em.close();
+        }
+    }
+
+    public void deleteById(Long id) {
+        delete(id);
+    }
+
+    public void close() {
+        if (emf != null && emf.isOpen()) {
+            emf.close();
         }
     }
 }
