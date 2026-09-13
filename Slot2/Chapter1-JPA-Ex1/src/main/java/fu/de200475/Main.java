@@ -41,10 +41,10 @@ public class Main {
         Employee reChecked = dao.findById(emp.getId());
         System.out.println("Kiem tra lai trong DB: " + reChecked);
 
-        System.out.println("\n=== 5. DELETE (TODO 0.7) ===");
-        dao.delete(emp.getId());
-        Employee afterDelete = dao.findById(emp.getId());
-        System.out.println("Sau khi xoa, tim lai: " + afterDelete); // Ky vong: null
+//        System.out.println("\n=== 5. DELETE (TODO 0.7) ===");
+//        dao.delete(emp.getId());
+ //       Employee afterDelete = dao.findById(emp.getId());
+   //     System.out.println("Sau khi xoa, tim lai: " + afterDelete); // Ky vong: null
 
         System.out.println("\n=== 6. CHECK UNIQUE CONSTRAINT (TODO 0.9) ===");
         Employee dup1 = new Employee("User 1", "trung@fpt.edu.vn",
@@ -62,9 +62,9 @@ public class Main {
         }
 
         // Cleanup test data
-        if (dup1.getId() != null) {
-            dao.delete(dup1.getId());
-        }
+//        if (dup1.getId() != null) {
+//            dao.delete(dup1.getId());
+  //      }
 
         dao.close();
         System.out.println("\n=== THUC HANH TODO 3 HOAN THANH ===");
