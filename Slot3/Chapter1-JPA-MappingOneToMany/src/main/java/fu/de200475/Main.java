@@ -1,17 +1,39 @@
 package fu.de200475;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import fu.de200475.dao.DepartmentDAO;
+import fu.de200475.pojo.Department;
+import fu.de200475.pojo.Employee;
+import fu.de200475.pojo.Gender;
+import fu.de200475.util.JPAUtil;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 public class Main {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+        DepartmentDAO departmentDAO = new DepartmentDAO();
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+        Department it = new Department("Marketing", "Ha Noi");
+        Employee e1 = new Employee("aa.nguyen@company.com", "Nguyen Van A", Gender.MALE,
+                new BigDecimal("15000000"), LocalDate.of(2022, 1, 10));
+        Employee e2 = new Employee("bb.tran@company.com", "Tran Thi B", Gender.FEMALE,
+                new BigDecimal("18000000"), LocalDate.of(2021, 6, 1));
+        Employee e3 = new Employee("cc.le@company.com", "Le Van C", Gender.OTHER,
+                new BigDecimal("12000000"), LocalDate.of(2023, 3, 15));
+
+        it.addEmployee(e1);
+        it.addEmployee(e2);
+        it.addEmployee(e3);
+
+        departmentDAO.save(it);
+        System.out.println("Da luu Department, id = " + it.getId());
+
+        Department found = departmentDAO.findByIdWithEmployees(it.getId());
+        System.out.println("Phong ban: " + found.getName());
+        for (Employee e : found.getEmployees()) {
+            System.out.println("  - " + e);
         }
+
+        JPAUtil.close();
     }
 }
